@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 app.use((request, response, next) => {
     var timeOfRequest = new Date();
-    console.log(`${timeOfRequest} => method : ${request.method} => url : ${request.url}`);
+    //  console.log(`${timeOfRequest} => method : ${request.method} => url : ${request.url}`);
     next();
 });
 
@@ -31,3 +31,5 @@ app.post('/todos', (request, response) => {
 app.listen(3000, () => {
     console.log("Server is listening on port 3000")
 });
+
+module.exports.app = app;
