@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 app.use((request, response, next) => {
     var timeOfRequest = new Date();
-    //  console.log(`${timeOfRequest} => method : ${request.method} => url : ${request.url}`);
+     console.log(`${timeOfRequest} => method : ${request.method} => url : ${request.url}`);
     next();
 });
 
@@ -25,6 +25,23 @@ app.post('/todos', (request, response) => {
         response.send(doc);
     }).catch((error) => {
         response.status(400).send(error);
+    });
+});
+
+// Get all todos
+app.get('/todos', (request, response) => {
+    Todo.find().then((todos) => {
+        responseData = {
+            data : todos,
+            success : 1
+        };
+        response.send(responseData);
+    }).catch((error) => {
+        responseData = {
+            errorMessage : error,
+            error : 1
+        };
+        response.status(400).send(responseData);
     });
 });
 
