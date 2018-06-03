@@ -5,10 +5,20 @@ const {app} = require('./../server.js');
 const {Todo} = require('./../models/todo.js');
 const {User} = require('./../models/user.js');
 
+dummyTodos = [{
+    text : "todo 1"
+}, {
+    text : "text 2"
+}];
+
 // Clear up the database
 beforeEach((done) => {
     Todo.remove({}).then(() => {
-        done(); 
+        Todo.insertMany(dummyTodos).then(() => {
+            done();
+        }).catch((error) => {
+            done(error);
+        });
     }).catch((error) => {
         console.log(error);
     })
@@ -30,7 +40,7 @@ describe('POST /todos', () => {
                 }
 
                 // Checking this text is really inserted in side the database
-                Todo.find().then((todos) => {
+                Todo.find({text : text}).then((todos) => {
                     expect(todos.length).toBe(1);
                     expect(todos[0].text).toBe(text);
                     done();
@@ -52,11 +62,25 @@ describe('POST /todos', () => {
             }).end((error, response) => {
                 // also note should not be inserted in db
                 Todo.find().then((todos) => {
-                    expect(todos.length).toBe(0);
+                    expect(todos.length).toBe(2);
                     done();
                 }).catch((error) => {
                     return done(error);
                 })
+            });
+    });
+});
+
+describe('GET /todos', () => {
+    it("should get all todos", (done) => {
+        request(app)
+            .get('/todos')
+            .expect(200)
+            .expect((response) => {
+                expect(response.body.data.length).toBe(2);
+            })
+            .end((error, response) => {
+                return done();
             });
     });
 });
