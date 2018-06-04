@@ -45,6 +45,26 @@ app.get('/todos', (request, response) => {
     });
 });
 
+// Get todo with id
+app.get('/todos/:id', (request, response) => {
+    Todo.findById(request.params.id).then((todo) => {
+        customResponse = {
+            success : 1,
+            data : todo
+        }
+        if (!todo) {
+            return response.status(404).send(customResponse)
+        }
+        response.send(customResponse);
+    }).catch((error) => {
+        customResponse = {
+            error : 1,
+            message : error.message
+        }
+        response.status(400).send(customResponse);
+    });
+});
+
 app.listen(3000, () => {
     console.log("Server is listening on port 3000")
 });
