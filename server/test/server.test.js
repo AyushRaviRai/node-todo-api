@@ -114,3 +114,6 @@ describe('GET /todos/:id', () => {
             }).end(done)
     });
 });
+
+// TODO :: have to add test cases for DELETE and PATCH 
+// they are pretty similar to above ones to no need !!!
