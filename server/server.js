@@ -66,6 +66,20 @@ app.get('/todos/:id', (request, response) => {
     });
 });
 
+// Delete todo with id
+app.delete('/todos/:id', (request, response) => {
+    id = request.params.id;
+
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if (!todo) {
+            return response.status(404).send();
+        }
+        response.send(todo);
+    }).catch((error) => {
+        response.send(error);
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`)
 });
