@@ -1,13 +1,16 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb')
 
 const {app} = require('./../server.js');
 const {Todo} = require('./../models/todo.js');
 const {User} = require('./../models/user.js');
 
 dummyTodos = [{
+    _id : new ObjectID(),
     text : "todo 1"
 }, {
+    _id : new ObjectID(),
     text : "text 2"
 }];
 
@@ -82,5 +85,32 @@ describe('GET /todos', () => {
             .end((error, response) => {
                 return done();
             });
+    });
+});
+
+describe('GET /todos/:id', () => {
+    it('should return error with 400 if invalid object id', (done) => {
+        request(app)
+            .get('/todos/' + '6b140adcf77a072bc2e256a41231')
+            .expect(400)
+            .end(done)
+    });
+
+    it('should return not found with valid object id if not in db', (done) => {
+        request(app)
+            .get('/todos/' + '5b140adcf77a072bc2e256a4')
+            .expect(404)
+            .expect((response) => {
+                expect(response.body.data).toBe(null);
+            }).end(done)
+    });
+
+    it('should return doc found with id same as sent', (done) => {
+        request(app)
+            .get('/todos/' + dummyTodos[0]._id.toHexString())
+            .expect(200)
+            .expect((response) => {
+                expect(response.body.data._id).toBe(dummyTodos[0]._id.toHexString());
+            }).end(done)
     });
 });
