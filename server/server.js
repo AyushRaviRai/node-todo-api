@@ -5,8 +5,8 @@ var bodyParser = require('body-parser');
 var {mongoose} = require('./db/mongoose.js')
 var {User} = require('./models/user.js');
 var {Todo} = require('./models/todo.js');
+require('./config/config.js');
 
-const port = process.env.PORT || 3000;
 var app = express();
 
 app.use(bodyParser.json());
@@ -100,11 +100,11 @@ app.patch('/todos/:id', (request, response) => {
         response.send({todo});
     }).catch((error) => {
         response.status(400).send(error)
-    }).
+    });
 });
 
-app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`)
+app.listen(process.env.PORT, () => {
+    console.log(`Server is listening on port ${process.env.PORT}`)
 });
 
 module.exports.app = app;
