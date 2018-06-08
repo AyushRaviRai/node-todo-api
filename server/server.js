@@ -1,11 +1,12 @@
 const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
+require('./config/config.js');
 
 var {mongoose} = require('./db/mongoose.js')
 var {User} = require('./models/user.js');
 var {Todo} = require('./models/todo.js');
-require('./config/config.js');
+
 
 var app = express();
 
@@ -101,6 +102,21 @@ app.patch('/todos/:id', (request, response) => {
     }).catch((error) => {
         response.status(400).send(error)
     });
+});
+
+// Sign Up New User
+app.post('/user', (request, response) => {
+    var body = _.pick(request.body, ['email', 'password', 'name']);
+    var user = new User(body);
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        user.toJSON();
+        response.header('x-auth', token).send(user);
+    }).catch((error) => {
+        console.log("here", error);
+        response.status(400).send(error);
+    })
 });
 
 app.listen(process.env.PORT, () => {
