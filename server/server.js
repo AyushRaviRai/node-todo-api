@@ -6,6 +6,7 @@ require('./config/config.js');
 var {mongoose} = require('./db/mongoose.js')
 var {User} = require('./models/user.js');
 var {Todo} = require('./models/todo.js');
+var {authenticate} = require('./middleware/authenticate.js');
 
 
 var app = express();
@@ -117,6 +118,13 @@ app.post('/user', (request, response) => {
         console.log("here", error);
         response.status(400).send(error);
     })
+});
+
+app.get('/users/me', authenticate, (request, response) => {
+    if (request.user && request.token) {
+        response.send(request.user);
+    }
+    response.status(401).send();
 });
 
 app.listen(process.env.PORT, () => {
