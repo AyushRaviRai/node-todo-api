@@ -106,7 +106,7 @@ app.patch('/todos/:id', (request, response) => {
 });
 
 // Sign Up New User
-app.post('/user', (request, response) => {
+app.post('/users', (request, response) => {
     var body = _.pick(request.body, ['email', 'password', 'name']);
     var user = new User(body);
     user.save().then(() => {
@@ -115,7 +115,6 @@ app.post('/user', (request, response) => {
         user.toJSON();
         response.header('x-auth', token).send(user);
     }).catch((error) => {
-        console.log("here", error);
         response.status(400).send(error);
     })
 });

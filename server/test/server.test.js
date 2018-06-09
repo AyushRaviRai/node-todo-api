@@ -5,27 +5,12 @@ const {ObjectID} = require('mongodb')
 const {app} = require('./../server.js');
 const {Todo} = require('./../models/todo.js');
 const {User} = require('./../models/user.js');
-
-dummyTodos = [{
-    _id : new ObjectID(),
-    text : "todo 1"
-}, {
-    _id : new ObjectID(),
-    text : "text 2"
-}];
+const {dummyTodos, populateTodos, dummyUsers, populateUsers} = require('./seed/seed.js');
 
 // Clear up the database
-beforeEach((done) => {
-    Todo.remove({}).then(() => {
-        Todo.insertMany(dummyTodos).then(() => {
-            done();
-        }).catch((error) => {
-            done(error);
-        });
-    }).catch((error) => {
-        console.log(error);
-    })
-});
+beforeEach(populateTodos);
+
+beforeEach(populateUsers);
 
 describe('POST /todos', () => {
     it('should create new todo with valid data', (done) => {
@@ -117,3 +102,69 @@ describe('GET /todos/:id', () => {
 
 // TODO :: have to add test cases for DELETE and PATCH 
 // they are pretty similar to above ones to no need !!!
+
+
+describe('GET /users/me', () => {
+    it('should return user when token sahi diya hain ', (done) => {
+        request(app)
+            .get('/users/me')
+            .set('x-auth', dummyUsers[0].tokens[0].token)
+            .expect(200)
+            .expect((response) => {
+                expect(response.body._id).toBe(dummyUsers[0]._id.toHexString());
+                expect(response.body.email).toBe(dummyUsers[0].email);
+            }).end(done);
+    });
+
+    it('shoule return 401 is not authenticated', (done) => {
+        request(app)
+            .get('/users/me')
+            .expect(401)
+            .end(done);
+    });
+});
+
+
+describe('POST /users', () => {
+    it('it shoule create a user passing valid email', (done) => {
+        var email = 'nothing@gmail.com';
+        var password = 'ayush123!';
+        var name = "ayushhainbhai";
+
+        request(app)
+            .post('/users')
+            .send({email, password, name})
+            .expect(200)
+            .expect((response) => {
+                expect(response.headers['x-auth']).toBeTruthy();
+                expect(response.body.email).toBe(email);
+            }).end(done);
+    });
+
+    it('should return validation error is input invalid', (done) => {
+        var email = 'nothingsdfsd@gmail.com';
+        var password = 'ay';
+        var name = "ayushhainbhai";
+
+        request(app)
+            .post('/users')
+            .send({email, password, name})
+            .expect(400)
+            .end(done);
+    });
+
+    it('should not create user is email in use', (done) => {
+        var email = 'ayushravirai@gmail.com';
+        var password = 'aysdfsdfsdf';
+        var name = "ayushhainbhai";
+
+        request(app)
+            .post('/users')
+            .send({email, password, name})
+            .expect(400)
+            .expect((response) => {
+                expect(response.body.name).toBe('MongoError');
+                expect(response.body.code).toBe(11000);
+            }).end(done);
+    })
+});
