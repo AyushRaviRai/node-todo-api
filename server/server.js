@@ -7,6 +7,8 @@ var {mongoose} = require('./db/mongoose.js')
 var {User} = require('./models/user.js');
 var {Todo} = require('./models/todo.js');
 var {authenticate} = require('./middleware/authenticate.js');
+const bcrypt = require('bcryptjs');
+
 
 
 var app = express();
@@ -119,12 +121,27 @@ app.post('/users', (request, response) => {
     })
 });
 
+// Get User based on authenticate
 app.get('/users/me', authenticate, (request, response) => {
     if (request.user && request.token) {
         response.send(request.user);
     }
     response.status(401).send();
 });
+
+app.post('/users/login', (request, response) => {
+    var {email, password} = request.body;
+    User.findByCredentials(email, password).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            response.header('x-auth', token).send(user);
+        });
+    }).catch((error) => {
+        console.log(error);
+        response.status(400).send("Not able to login, Hurrrrrr !!");
+    });
+});
+
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is listening on port ${process.env.PORT}`)
