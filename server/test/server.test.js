@@ -68,7 +68,6 @@ describe('GET /todos', () => {
             .set('x-auth', dummyUsers[0].tokens[0].token)
             .expect(200)
             .expect((response) => {
-                console.log(response.body, response.body.data.length);
                 expect(response.body.data.length).toBe(2);
             })
             .end((error, response) => {
