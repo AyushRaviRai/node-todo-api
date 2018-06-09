@@ -168,3 +168,27 @@ describe('POST /users', () => {
             }).end(done);
     })
 });
+
+describe('POST /users/login', () => {
+    it('shoule return auth token with user detaails for valid user pass and email combo', (done) => {
+        var {email, password} = dummyUsers[0];
+        request(app)
+            .post('/users/login')
+            .send({email, password})
+            .expect(200)
+            .expect((response) => {
+                expect(response.body.email).toBe(email);
+                expect(response.headers['x-auth']).toBeTruthy();
+            }).end(done);
+    });
+
+    it('should return 404 error when wrong password given', (done) => {
+        var {email} = dummyUsers[0];
+        password = "abd12";
+        request(app)
+            .post('/users/login')
+            .send({email, password})
+            .expect(400)
+            .end(done);
+    });
+})

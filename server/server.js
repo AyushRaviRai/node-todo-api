@@ -129,6 +129,7 @@ app.get('/users/me', authenticate, (request, response) => {
     response.status(401).send();
 });
 
+// login user
 app.post('/users/login', (request, response) => {
     var {email, password} = request.body;
     User.findByCredentials(email, password).then((user) => {
@@ -136,9 +137,17 @@ app.post('/users/login', (request, response) => {
             response.header('x-auth', token).send(user);
         });
     }).catch((error) => {
-        console.log(error);
         response.status(400).send("Not able to login, Hurrrrrr !!");
     });
+});
+
+// logout user
+app.delete('/users/me/token', authenticate, (request, response) => {
+    request.user.removeToken(request.token).then(() => {
+        response.send();
+    }).catch((error) => {
+        response.status(400).send();
+    })
 });
 
 
