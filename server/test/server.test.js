@@ -17,6 +17,7 @@ describe('POST /todos', () => {
         var text = 'this is some new task'
         request(app)
             .post('/todos')
+            .set('x-auth', dummyUsers[0].tokens[0].token)
             .send({text})
             .expect(200)
             .expect((response) => {
@@ -43,6 +44,7 @@ describe('POST /todos', () => {
 
         request(app)
             .post('/todos')
+            .set('x-auth', dummyUsers[0].tokens[0].token)
             .send({text})
             .expect(400)
             .expect((response) => {
@@ -63,8 +65,10 @@ describe('GET /todos', () => {
     it("should get all todos", (done) => {
         request(app)
             .get('/todos')
+            .set('x-auth', dummyUsers[0].tokens[0].token)
             .expect(200)
             .expect((response) => {
+                console.log(response.body, response.body.data.length);
                 expect(response.body.data.length).toBe(2);
             })
             .end((error, response) => {
@@ -77,6 +81,7 @@ describe('GET /todos/:id', () => {
     it('should return error with 400 if invalid object id', (done) => {
         request(app)
             .get('/todos/' + '6b140adcf77a072bc2e256a41231')
+            .set('x-auth', dummyUsers[0].tokens[0].token)
             .expect(400)
             .end(done)
     });
@@ -84,6 +89,7 @@ describe('GET /todos/:id', () => {
     it('should return not found with valid object id if not in db', (done) => {
         request(app)
             .get('/todos/' + '5b140adcf77a072bc2e256a4')
+            .set('x-auth', dummyUsers[0].tokens[0].token)
             .expect(404)
             .expect((response) => {
                 expect(response.body.data).toBe(null);
@@ -93,6 +99,7 @@ describe('GET /todos/:id', () => {
     it('should return doc found with id same as sent', (done) => {
         request(app)
             .get('/todos/' + dummyTodos[0]._id.toHexString())
+            .set('x-auth', dummyUsers[0].tokens[0].token)
             .expect(200)
             .expect((response) => {
                 expect(response.body.data._id).toBe(dummyTodos[0]._id.toHexString());
@@ -191,4 +198,11 @@ describe('POST /users/login', () => {
             .expect(400)
             .end(done);
     });
-})
+});
+
+describe('DELETE logging out', () => {
+    it('should log out a valid user with valid token', (done) => {
+        done("bhak bc main na nahi kara raha bore ho gya test se :P");
+    });
+});
+    

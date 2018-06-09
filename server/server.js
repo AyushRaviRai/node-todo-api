@@ -22,9 +22,10 @@ app.use((request, response, next) => {
 });
 
 // Create New Todo
-app.post('/todos', (request, response) => {
+app.post('/todos', authenticate, (request, response) => {
     var newTask = new Todo({
-        text : request.body.text
+        text : request.body.text,
+        _creator : request.user._id
     });
 
     newTask.save().then((doc) => {
@@ -35,8 +36,8 @@ app.post('/todos', (request, response) => {
 });
 
 // Get all todos
-app.get('/todos', (request, response) => {
-    Todo.find().then((todos) => {
+app.get('/todos', authenticate, (request, response) => {
+    Todo.find({_creator : request.user._id}).then((todos) => {
         responseData = {
             data : todos,
             success : 1
@@ -52,8 +53,11 @@ app.get('/todos', (request, response) => {
 });
 
 // Get todo with id
-app.get('/todos/:id', (request, response) => {
-    Todo.findById(request.params.id).then((todo) => {
+app.get('/todos/:id', authenticate, (request, response) => {
+    Todo.findOne({
+        _id : request.params.id,
+        _creator : request.user._id
+    }).then((todo) => {
         customResponse = {
             success : 1,
             data : todo
@@ -149,8 +153,6 @@ app.delete('/users/me/token', authenticate, (request, response) => {
         response.status(400).send();
     })
 });
-
-
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is listening on port ${process.env.PORT}`)

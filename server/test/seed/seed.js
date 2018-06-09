@@ -5,16 +5,19 @@ const {User} = require('./../../models/user.js');
 const jwt = require('jsonwebtoken');
 
 
-dummyTodos = [{
-    _id : new ObjectID(),
-    text : "todo 1"
-}, {
-    _id : new ObjectID(),
-    text : "text 2"
-}];
-
 userOneId = new ObjectID();
 userTwoId = new ObjectID();
+
+dummyTodos = [{
+    _id : new ObjectID(),
+    text : "todo 1",
+    _creator : userOneId
+}, {
+    _id : new ObjectID(),
+    text : "text 2",
+    _creator : userTwoId
+}];
+
 dummyUsers = [{
     _id : userOneId,
     email : "ayushravirai@gmail.com",
